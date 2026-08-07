@@ -4,10 +4,18 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  // Las rutas publicas deben seguir respondiendo aunque falte configuracion
+  // o Supabase tenga un problema temporal. Las rutas privadas validan sesion
+  // nuevamente dentro del servidor.
+  if (!supabaseUrl || !supabaseKey) {
+    return response;
+  }
+
+  try {
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -21,9 +29,12 @@ export async function updateSession(request: NextRequest) {
           );
         },
       },
-    },
-  );
+    });
 
-  await supabase.auth.getClaims();
+    await supabase.auth.getClaims();
+  } catch (error) {
+    console.error("Supabase proxy session refresh failed:", error);
+  }
+
   return response;
 }
