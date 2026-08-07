@@ -1,5 +1,6 @@
 -- Liga Serrana - migracion inicial
 -- Crea perfiles, roles y alta automatica de perfil al crear un usuario en Supabase Auth.
+-- Deploy inicial disparado tras configurar GitHub Secrets.
 
 do $$
 begin
