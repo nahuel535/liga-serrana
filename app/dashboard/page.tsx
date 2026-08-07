@@ -4,21 +4,36 @@ import { logout } from "./actions";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
 
-  if (claimsError || !claimsData?.claims?.sub) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    console.error("[dashboard] auth.getUser failed", userError?.message ?? "no user");
     redirect("/login");
   }
 
-  const userId = claimsData.claims.sub;
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, role")
-    .eq("id", userId)
-    .maybeSingle();
+  let displayName = user.user_metadata?.full_name || "Usuario Liga Serrana";
+  let role = "sin rol";
 
-  const displayName = profile?.full_name || "Usuario Liga Serrana";
-  const role = profile?.role || "sin rol";
+  try {
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("full_name, role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error("[dashboard] profile query failed", profileError.message);
+    } else if (profile) {
+      displayName = profile.full_name || displayName;
+      role = typeof profile.role === "string" ? profile.role : role;
+    }
+  } catch (error) {
+    console.error("[dashboard] unexpected profile error", error);
+  }
 
   return (
     <main className="dashboard-shell">
