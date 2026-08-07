@@ -40,3 +40,5 @@ npm run dev
 ## Próximo bloque
 
 Panel de administración y gestión de equipos/jugadores.
+
+<!-- redeploy trigger -->
