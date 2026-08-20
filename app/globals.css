@@ -64,8 +64,55 @@ h1 { margin: 22px 0 18px; font-size: clamp(3rem, 8vw, 6.8rem); line-height: .92;
 .panel h2 { margin-top: 0; }
 .role-pill { display: inline-flex; padding: 7px 10px; border-radius: 999px; background: rgba(199,255,61,.12); color: var(--accent); font-size: .8rem; text-transform: uppercase; }
 
+.dashboard-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 4px; }
+.dashboard-nav-link { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: .88rem; }
+.dashboard-nav-link:hover { color: var(--text); border-color: var(--accent); }
+
+.panel h2 { font-size: 1.15rem; margin: 26px 0 10px; }
+.panel h3 { font-size: 1rem; margin: 20px 0 8px; color: var(--muted); }
+.panel form { margin-bottom: 18px; }
+
+.list { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }
+.list-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; font-size: .92rem; }
+.partido-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; }
+.partido-row > div { display: flex; flex-direction: column; gap: 4px; }
+.partido-row strong { font-size: 1rem; }
+
+.table { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: .9rem; }
+.table th, .table td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+.table th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; }
+
+.badge { display: inline-flex; padding: 4px 9px; border-radius: 999px; font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; background: rgba(199,255,61,.12); color: var(--accent); margin-right: 6px; }
+.badge-ok { background: rgba(199,255,61,.14); color: var(--accent); }
+.badge-off { background: rgba(255,107,107,.12); color: var(--danger); }
+.badge-live { background: var(--danger); color: #fff; animation: pulso 1.6s ease-in-out infinite; }
+@keyframes pulso { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; }
+.chip { padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
+.chip-active { background: var(--accent); color: var(--accent-dark); border-color: var(--accent); font-weight: 700; }
+
+.checkbox-field { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: .9rem; color: var(--muted); }
+.checkbox-field input { width: auto; }
+
+.field select { width: 100%; padding: 13px 14px; border-radius: 11px; border: 1px solid var(--line); background: #0a1510; color: var(--text); outline: none; }
+.inline-form { display: flex; gap: 8px; align-items: center; }
+.inline-form select { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: #0a1510; color: var(--text); }
+
+.marcador { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 26px 0 10px; text-align: center; }
+.marcador-equipo { font-size: 1.1rem; font-weight: 700; flex: 1; }
+.marcador-resultado { font-size: 2.4rem; font-weight: 900; letter-spacing: -.03em; }
+.marcador-estado { text-align: center; margin-bottom: 10px; }
+
+.carnet { display: flex; gap: 18px; align-items: center; padding: 20px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 16px; }
+.carnet-foto { width: 96px; height: 96px; border-radius: 14px; overflow: hidden; background: var(--accent); color: var(--accent-dark); display: grid; place-items: center; font-size: 2.4rem; font-weight: 900; flex-shrink: 0; }
+.carnet-foto img { width: 100%; height: 100%; object-fit: cover; }
+.carnet-datos { display: flex; flex-direction: column; gap: 4px; }
+.carnet-datos strong { font-size: 1.3rem; }
+
 @media (max-width: 760px) {
   .feature-grid, .dashboard-grid { grid-template-columns: 1fr; }
   .hero { padding: 72px 0 60px; }
   .topbar { min-height: 74px; }
+  .partido-row, .list-row { flex-direction: column; align-items: flex-start; }
 }
