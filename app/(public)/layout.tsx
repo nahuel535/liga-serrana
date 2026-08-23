@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function PublicoLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main className="landing-shell">
+    <main className="landing-shell tema-hincha">
       <nav className="topbar">
         <Link href="/" className="brand-mark-link">
           <div className="brand-mark">LS</div>

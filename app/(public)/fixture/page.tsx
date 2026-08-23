@@ -72,7 +72,7 @@ export default async function FixturePublicoPage({
   const resultados = partidos.filter((p) => p.estado === "finalizado" || p.estado === "suspendido");
 
   return (
-    <article className="panel">
+    <>
       <h1>Fixture</h1>
 
       {categorias && categorias.length > 0 && (
@@ -93,56 +93,61 @@ export default async function FixturePublicoPage({
 
       <h2>Próximos partidos</h2>
       {proximos.length > 0 ? (
-        <ul className="list">
+        <div className="ticket-list">
           {proximos.map((partido) => (
-            <li key={partido.id} className="partido-row">
-              <div>
-                <span className={`badge ${partido.estado === "en_vivo" ? "badge-live" : ""}`}>
-                  {ETIQUETA_ESTADO[partido.estado]}
-                </span>
-                <strong>
-                  {partido.equipo_local?.nombre ?? "?"} vs {partido.equipo_visitante?.nombre ?? "?"}
-                </strong>
-                <span className="muted">
+            <Link key={partido.id} href={`/partidos/${partido.id}`} className={`ticket ${partido.estado === "en_vivo" ? "ticket-live" : ""}`}>
+              <div className="ticket-main">
+                <div className="ticket-teams">
+                  <span className="ticket-team">{partido.equipo_local?.nombre ?? "?"}</span>
+                  <span className="ticket-vs">vs</span>
+                  <span className="ticket-team">{partido.equipo_visitante?.nombre ?? "?"}</span>
+                </div>
+                <span className="ticket-meta">
                   {partido.fecha_numero ? `Fecha ${partido.fecha_numero} · ` : ""}
                   {partido.llave ? `${partido.llave} · ` : ""}
                   {formatearFecha(partido.fecha_hora)}
                   {partido.cancha ? ` · ${partido.cancha}` : ""}
                 </span>
               </div>
-              <Link className="button button-secondary" href={`/partidos/${partido.id}`}>
-                {partido.estado === "en_vivo" ? "Ver en vivo" : "Ver"}
-              </Link>
-            </li>
+              <div className="ticket-stub">
+                <span className={`badge ${partido.estado === "en_vivo" ? "badge-live" : ""}`}>
+                  {ETIQUETA_ESTADO[partido.estado]}
+                </span>
+                <span className="ticket-cta">{partido.estado === "en_vivo" ? "Ver ahora" : "Ver"}</span>
+              </div>
+            </Link>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p className="muted">No hay partidos programados en esta categoría.</p>
+        <p className="empty-state">No hay partidos programados en esta categoría.</p>
       )}
 
       <h2>Resultados</h2>
       {resultados.length > 0 ? (
-        <ul className="list">
+        <div className="ticket-list">
           {resultados.map((partido) => (
-            <li key={partido.id} className="partido-row">
-              <div>
-                <strong>
-                  {partido.equipo_local?.nombre ?? "?"} {partido.goles_local} - {partido.goles_visitante}{" "}
-                  {partido.equipo_visitante?.nombre ?? "?"}
-                </strong>
-                <span className="muted">
+            <Link key={partido.id} href={`/partidos/${partido.id}`} className="ticket">
+              <div className="ticket-main">
+                <div className="ticket-teams">
+                  <span className="ticket-team">{partido.equipo_local?.nombre ?? "?"}</span>
+                  <span className="ticket-score">{partido.goles_local} - {partido.goles_visitante}</span>
+                  <span className="ticket-team">{partido.equipo_visitante?.nombre ?? "?"}</span>
+                </div>
+                <span className="ticket-meta">
                   {partido.fecha_numero ? `Fecha ${partido.fecha_numero} · ` : ""}
                   {partido.llave ? `${partido.llave} · ` : ""}
                   {ETIQUETA_ESTADO[partido.estado]}
                 </span>
               </div>
-              <Link className="button button-secondary" href={`/partidos/${partido.id}`}>Ver</Link>
-            </li>
+              <div className="ticket-stub">
+                <span className="ticket-cta">Ver</span>
+              </div>
+            </Link>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p className="muted">Todavía no hay resultados.</p>
+        <p className="empty-state">Todavía no hay resultados.</p>
       )}
-    </article>
+    </>
   );
 }

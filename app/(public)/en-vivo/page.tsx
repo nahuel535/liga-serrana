@@ -16,38 +16,42 @@ export default async function EnVivoPage() {
     .order("fecha_hora", { ascending: true });
 
   return (
-    <article className="panel">
+    <>
       <h1>En vivo</h1>
 
       {partidos && partidos.length > 0 ? (
-        <ul className="list">
+        <div className="ticket-list">
           {partidos.map((partido) => {
             const fase = partido.fase as unknown as { nombre: string; categoria: { nombre: string } } | null;
             const local = partido.equipo_local as unknown as { nombre: string } | null;
             const visitante = partido.equipo_visitante as unknown as { nombre: string } | null;
             return (
-              <li key={partido.id} className="partido-row">
-                <div>
-                  <span className="badge badge-live">En vivo</span>
-                  <strong>
-                    {local?.nombre ?? "?"} {partido.goles_local} - {partido.goles_visitante} {visitante?.nombre ?? "?"}
-                  </strong>
-                  <span className="muted">
+              <Link key={partido.id} href={`/partidos/${partido.id}`} className="ticket ticket-live">
+                <div className="ticket-main">
+                  <div className="ticket-teams">
+                    <span className="ticket-team">{local?.nombre ?? "?"}</span>
+                    <span className="ticket-score">{partido.goles_local} - {partido.goles_visitante}</span>
+                    <span className="ticket-team">{visitante?.nombre ?? "?"}</span>
+                  </div>
+                  <span className="ticket-meta">
                     {fase?.categoria?.nombre} · {fase?.nombre}
                     {partido.cancha ? ` · ${partido.cancha}` : ""}
                   </span>
                 </div>
-                <Link className="button button-primary" href={`/partidos/${partido.id}`}>Ver</Link>
-              </li>
+                <div className="ticket-stub">
+                  <span className="badge badge-live">En vivo</span>
+                  <span className="ticket-cta">Ver ahora</span>
+                </div>
+              </Link>
             );
           })}
-        </ul>
+        </div>
       ) : (
-        <p className="muted">
-          No hay ningún partido en vivo en este momento. Mirá el{" "}
-          <Link href="/fixture">fixture</Link> para ver los próximos.
+        <p className="empty-state">
+          No hay ningún partido en vivo en este momento.<br />
+          Mirá el <Link href="/fixture" style={{ color: "var(--accent)" }}>fixture</Link> para ver los próximos.
         </p>
       )}
-    </article>
+    </>
   );
 }

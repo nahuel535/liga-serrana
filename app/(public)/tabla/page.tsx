@@ -80,36 +80,38 @@ export default async function TablaPublicaPage({
       {filas.length > 0 ? (
         <>
           <p className="muted">{nombreFase}</p>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Equipo</th>
-                <th>PJ</th>
-                <th>PG</th>
-                <th>PE</th>
-                <th>PP</th>
-                <th>GF</th>
-                <th>GC</th>
-                <th>DG</th>
-                <th>Pts</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filas.map((fila, indice) => (
-                <tr key={fila.equipo_id}>
-                  <td>{indice + 1}. {equiposPorId[fila.equipo_id] ?? "Equipo"}</td>
-                  <td>{fila.pj}</td>
-                  <td>{fila.pg}</td>
-                  <td>{fila.pe}</td>
-                  <td>{fila.pp}</td>
-                  <td>{fila.gf}</td>
-                  <td>{fila.gc}</td>
-                  <td>{fila.dg}</td>
-                  <td><strong>{fila.puntos}</strong></td>
+          <div className="table-scroll">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Equipo</th>
+                  <th>PJ</th>
+                  <th>PG</th>
+                  <th>PE</th>
+                  <th>PP</th>
+                  <th>GF</th>
+                  <th>GC</th>
+                  <th>DG</th>
+                  <th>Pts</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filas.map((fila, indice) => (
+                  <tr key={fila.equipo_id}>
+                    <td>{indice + 1}. {equiposPorId[fila.equipo_id] ?? "Equipo"}</td>
+                    <td>{fila.pj}</td>
+                    <td>{fila.pg}</td>
+                    <td>{fila.pe}</td>
+                    <td>{fila.pp}</td>
+                    <td>{fila.gf}</td>
+                    <td>{fila.gc}</td>
+                    <td>{fila.dg}</td>
+                    <td><strong>{fila.puntos}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       ) : (
         <p className="muted">Todavía no hay resultados de fase liga para esta categoría.</p>

@@ -123,3 +123,224 @@ h1 { margin: 22px 0 18px; font-size: clamp(3rem, 8vw, 6.8rem); line-height: .92;
   .topbar { min-height: 74px; }
   .partido-row, .list-row { flex-direction: column; align-items: flex-start; }
 }
+
+/* ==========================================================
+   TEMA HINCHA — rojo / negro / blanco
+   Solo para lo que ve el público: portada + fixture/tabla/en vivo/
+   partido. El panel interno (dashboard) no se toca, sigue con su
+   paleta verde original.
+   ========================================================== */
+
+.tema-hincha {
+  --bg: #0b0b0d;
+  --surface: #17171b;
+  --surface-2: #1f1f24;
+  --line: #2b2b31;
+  --text: #f6f5f3;
+  --muted: #99969d;
+  --accent: #e11a2e;
+  --accent-dark: #ffffff;
+  --danger: #ff2d3f;
+  min-height: 100vh;
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+/* El fondo ambiental del <body> es verde por defecto (tema del panel);
+   cuando la pagina usa el tema hincha, lo reemplazamos por el rojo. */
+body:has(.tema-hincha) {
+  background: radial-gradient(circle at 78% 8%, rgba(225,26,46,.16), transparent 30rem), #0b0b0d;
+}
+
+.tema-hincha h1, .tema-hincha h2, .tema-hincha h3,
+.tema-hincha .brand-copy strong,
+.tema-hincha .public-nav-link,
+.tema-hincha .eyebrow,
+.tema-hincha .chip,
+.tema-hincha .feature-card h2,
+.tema-hincha .ticket-teams,
+.tema-hincha .marcador-equipo,
+.tema-hincha .button {
+  font-family: 'Oswald', Arial, sans-serif;
+}
+
+.tema-hincha h1 { text-transform: uppercase; font-weight: 700; letter-spacing: -.01em; }
+.tema-hincha .eyebrow { color: var(--accent); border-color: var(--line); text-transform: uppercase; }
+.tema-hincha .hero { padding: 56px 0 40px; }
+.tema-hincha .hero p { max-width: 520px; }
+
+.tema-hincha .brand-mark { background: var(--accent); color: #fff; border-radius: 8px; }
+.tema-hincha .brand-copy strong { text-transform: uppercase; letter-spacing: .04em; font-size: 1.02rem; }
+
+.tema-hincha .topbar { gap: 10px 18px; flex-wrap: wrap; }
+.tema-hincha .public-nav-link { text-transform: uppercase; font-size: .8rem; letter-spacing: .07em; font-weight: 600; }
+
+.tema-hincha .button { border-radius: 5px; text-transform: uppercase; letter-spacing: .05em; font-size: .85rem; }
+.tema-hincha .button-primary { background: var(--accent); color: #fff; }
+.tema-hincha .button-secondary { background: transparent; border: 1.5px solid var(--line); color: var(--text); }
+.tema-hincha .button-secondary:hover { border-color: var(--accent); }
+
+.tema-hincha .feature-card, .tema-hincha .feature-card-link {
+  background: var(--surface);
+  border-radius: 6px;
+  transition: border-color .15s ease;
+}
+.tema-hincha .feature-card span { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--accent); }
+.tema-hincha .feature-card h2 { text-transform: uppercase; letter-spacing: .01em; font-size: 1.15rem; }
+.tema-hincha .feature-card-link:hover { border-color: var(--accent); }
+
+.tema-hincha .panel { background: var(--surface); border-radius: 8px; }
+.tema-hincha .panel h1 { text-transform: uppercase; font-size: 1.9rem; }
+.tema-hincha .panel h2 { text-transform: uppercase; font-size: .95rem; letter-spacing: .04em; color: var(--muted); }
+
+.tema-hincha .chip-row { gap: 8px; }
+.tema-hincha .chip {
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-size: .76rem;
+  letter-spacing: .05em;
+  font-weight: 600;
+  padding: 8px 14px;
+}
+.tema-hincha .chip-active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.tema-hincha .badge {
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: .05em;
+}
+.tema-hincha .badge-live {
+  background: var(--accent);
+  color: #fff;
+  animation: destello 1.6s ease-in-out infinite;
+}
+@keyframes destello {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(225,26,46,.55); }
+  50% { box-shadow: 0 0 0 6px rgba(225,26,46,0); }
+}
+
+.tema-hincha .table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 0 18px;
+}
+.tema-hincha .table-scroll .table { margin-bottom: 0; min-width: 480px; }
+.tema-hincha .table-scroll .table td:first-child,
+.tema-hincha .table-scroll .table th:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+  min-width: 140px;
+}
+.tema-hincha .table th {
+  color: var(--muted);
+  border-bottom: 2px solid var(--accent);
+  font-family: 'Oswald', Arial, sans-serif;
+  letter-spacing: .06em;
+}
+.tema-hincha .table td { font-variant-numeric: tabular-nums; }
+.tema-hincha .table td:first-child { font-family: 'Oswald', Arial, sans-serif; text-transform: uppercase; letter-spacing: .01em; }
+.tema-hincha .table strong { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--accent); }
+.tema-hincha .table tbody tr:first-child td:first-child { border-left: 3px solid var(--accent); padding-left: 7px; }
+
+.tema-hincha .marcador { padding: 30px 0 12px; }
+.tema-hincha .marcador-equipo { text-transform: uppercase; letter-spacing: .01em; font-size: 1rem; }
+.tema-hincha .marcador-resultado { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--accent); font-size: 2.7rem; font-weight: 700; letter-spacing: 0; }
+
+.tema-hincha .list-row { background: var(--surface-2); border-radius: 6px; }
+
+/* ---------- Ticket: la tarjeta de partido, con muescas de entrada ---------- */
+
+.tema-hincha .ticket-list { display: grid; gap: 14px; margin: 0 0 8px; }
+.tema-hincha .ticket {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tema-hincha .ticket-live { border-color: var(--accent); }
+.tema-hincha a.ticket { transition: border-color .15s ease; }
+.tema-hincha a.ticket:hover { border-color: var(--accent); }
+.tema-hincha :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tema-hincha .ticket-main { flex: 1; min-width: 0; padding: 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+.tema-hincha .ticket-teams { display: flex; align-items: center; gap: 8px; font-size: .98rem; text-transform: uppercase; letter-spacing: .01em; }
+.tema-hincha .ticket-team { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tema-hincha .ticket-score {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tema-hincha .ticket-vs { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--muted); font-size: .78rem; flex-shrink: 0; }
+.tema-hincha .ticket-meta { color: var(--muted); font-size: .8rem; }
+
+.tema-hincha .ticket-stub {
+  position: relative;
+  flex-shrink: 0;
+  width: 104px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  background: var(--surface-2);
+  border-left: 2px dashed var(--line);
+}
+.tema-hincha .ticket-live .ticket-stub { background: rgba(225,26,46,.12); border-left-color: rgba(225,26,46,.4); }
+.tema-hincha .ticket-stub::before,
+.tema-hincha .ticket-stub::after {
+  content: "";
+  position: absolute;
+  left: -9px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.tema-hincha .ticket-stub::before { top: -9px; }
+.tema-hincha .ticket-stub::after { bottom: -9px; }
+.tema-hincha .ticket-cta {
+  font-family: 'Oswald', Arial, sans-serif;
+  text-transform: uppercase;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  font-weight: 600;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+.tema-hincha .ticket-live .ticket-cta { background: var(--accent); color: #fff; }
+
+.tema-hincha .empty-state {
+  padding: 32px 18px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+@media (max-width: 480px) {
+  .tema-hincha .ticket { flex-direction: column; }
+  .tema-hincha .ticket-stub {
+    width: auto;
+    flex-direction: row;
+    border-left: 0;
+    border-top: 2px dashed var(--line);
+    padding: 10px 14px;
+    justify-content: space-between;
+  }
+  .tema-hincha .ticket-stub::before,
+  .tema-hincha .ticket-stub::after { left: auto; top: -9px; }
+  .tema-hincha .ticket-stub::before { right: 22px; }
+  .tema-hincha .ticket-stub::after { right: -9px; }
+}
