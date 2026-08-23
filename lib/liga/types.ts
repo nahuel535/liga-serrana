@@ -67,6 +67,31 @@ export type EventoPartido = {
   created_at: string;
 };
 
+export type ReglasDisciplinarias = {
+  id: string;
+  temporada_id: string;
+  amarillas_para_suspension: number;
+  partidos_suspension_amarillas: number;
+  partidos_suspension_roja: number;
+};
+
+export type Sancion = {
+  id: string;
+  jugador_id: string;
+  equipo_id: string;
+  motivo: "acumulacion_amarillas" | "tarjeta_roja" | "manual";
+  partido_origen_id: string | null;
+  partidos_totales: number;
+  partidos_cumplidos: number;
+  activa: boolean;
+};
+
+export const ETIQUETA_MOTIVO_SANCION: Record<Sancion["motivo"], string> = {
+  acumulacion_amarillas: "Acumulación de amarillas",
+  tarjeta_roja: "Tarjeta roja",
+  manual: "Sanción del tribunal",
+};
+
 export const ETIQUETA_ESTADO: Record<PartidoEstado, string> = {
   programado: "Programado",
   en_vivo: "En vivo",

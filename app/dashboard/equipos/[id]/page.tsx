@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSesion, exigirRol } from "@/lib/liga/auth";
-import { crearJugador, alternarHabilitado, inscribirEquipo, vincularJugador } from "./actions";
+import { ETIQUETA_MOTIVO_SANCION } from "@/lib/liga/types";
+import {
+  crearJugador,
+  alternarHabilitado,
+  inscribirEquipo,
+  vincularJugador,
+  levantarSancion,
+  crearSancionManual,
+} from "./actions";
 
 export default async function EquipoDetallePage({
   params,
@@ -15,27 +23,50 @@ export default async function EquipoDetallePage({
   const { id } = await params;
   const { error } = await searchParams;
 
-  const [{ data: equipo }, { data: jugadores }, { data: inscripciones }, { data: categorias }, { data: temporadas }, { data: perfilesJugador }] =
-    await Promise.all([
-      supabase.from("equipos").select("id, nombre, escudo_url").eq("id", id).maybeSingle(),
-      supabase
-        .from("jugadores")
-        .select("id, nombre_completo, dni, numero_camiseta, habilitado, profile_id")
-        .eq("equipo_id", id)
-        .order("numero_camiseta", { ascending: true, nullsFirst: false }),
-      supabase
-        .from("inscripciones")
-        .select("id, categorias(nombre), temporadas(nombre)")
-        .eq("equipo_id", id),
-      supabase.from("categorias").select("id, nombre").order("orden"),
-      supabase.from("temporadas").select("id, nombre, activa").order("created_at", { ascending: false }),
-      supabase.from("profiles").select("id, full_name").eq("role", "jugador").eq("active", true),
-    ]);
+  const [
+    { data: equipo },
+    { data: jugadores },
+    { data: inscripciones },
+    { data: categorias },
+    { data: temporadas },
+    { data: perfilesJugador },
+    { data: sanciones },
+  ] = await Promise.all([
+    supabase.from("equipos").select("id, nombre, escudo_url").eq("id", id).maybeSingle(),
+    supabase
+      .from("jugadores")
+      .select("id, nombre_completo, dni, numero_camiseta, habilitado, profile_id")
+      .eq("equipo_id", id)
+      .order("numero_camiseta", { ascending: true, nullsFirst: false }),
+    supabase
+      .from("inscripciones")
+      .select("id, categorias(nombre), temporadas(nombre)")
+      .eq("equipo_id", id),
+    supabase.from("categorias").select("id, nombre").order("orden"),
+    supabase.from("temporadas").select("id, nombre, activa").order("created_at", { ascending: false }),
+    supabase.from("profiles").select("id, full_name").eq("role", "jugador").eq("active", true),
+    supabase
+      .from("sanciones")
+      .select("id, jugador_id, motivo, partidos_totales, partidos_cumplidos, activa")
+      .eq("equipo_id", id)
+      .eq("activa", true),
+  ]);
 
   if (!equipo) notFound();
 
   const crearJugadorConEquipo = crearJugador.bind(null, equipo.id);
   const inscribirConEquipo = inscribirEquipo.bind(null, equipo.id);
+  const crearSancionConEquipo = crearSancionManual.bind(null, equipo.id);
+
+  const sancionesPorJugador = new Map<string, { restantes: number; motivo: string }>();
+  (sanciones ?? []).forEach((s) => {
+    const restantes = s.partidos_totales - s.partidos_cumplidos;
+    const previa = sancionesPorJugador.get(s.jugador_id);
+    sancionesPorJugador.set(s.jugador_id, {
+      restantes: (previa?.restantes ?? 0) + restantes,
+      motivo: ETIQUETA_MOTIVO_SANCION[s.motivo as keyof typeof ETIQUETA_MOTIVO_SANCION] ?? s.motivo,
+    });
+  });
 
   return (
     <section className="dashboard-grid">
@@ -52,43 +83,56 @@ export default async function EquipoDetallePage({
                 <th>Nombre</th>
                 <th>DNI</th>
                 <th>Estado</th>
+                <th>Suspensión</th>
                 <th></th>
                 <th>Cuenta vinculada (carnet)</th>
               </tr>
             </thead>
             <tbody>
-              {jugadores.map((jugador) => (
-                <tr key={jugador.id}>
-                  <td>{jugador.numero_camiseta ?? "—"}</td>
-                  <td>{jugador.nombre_completo}</td>
-                  <td>{jugador.dni}</td>
-                  <td>
-                    <span className={`badge ${jugador.habilitado ? "badge-ok" : "badge-off"}`}>
-                      {jugador.habilitado ? "Habilitado" : "Inhabilitado"}
-                    </span>
-                  </td>
-                  <td>
-                    <form
-                      action={alternarHabilitado.bind(null, equipo.id, jugador.id, jugador.habilitado)}
-                    >
-                      <button className="button button-secondary" type="submit">
-                        {jugador.habilitado ? "Inhabilitar" : "Habilitar"}
-                      </button>
-                    </form>
-                  </td>
-                  <td>
-                    <form action={vincularJugador.bind(null, equipo.id, jugador.id)} className="inline-form">
-                      <select name="profile_id" defaultValue={jugador.profile_id ?? ""}>
-                        <option value="">Sin vincular</option>
-                        {(perfilesJugador ?? []).map((p) => (
-                          <option key={p.id} value={p.id}>{p.full_name ?? p.id}</option>
-                        ))}
-                      </select>
-                      <button className="button button-secondary" type="submit">Vincular</button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
+              {jugadores.map((jugador) => {
+                const sancion = sancionesPorJugador.get(jugador.id);
+                return (
+                  <tr key={jugador.id}>
+                    <td>{jugador.numero_camiseta ?? "—"}</td>
+                    <td>{jugador.nombre_completo}</td>
+                    <td>{jugador.dni}</td>
+                    <td>
+                      <span className={`badge ${jugador.habilitado ? "badge-ok" : "badge-off"}`}>
+                        {jugador.habilitado ? "Habilitado" : "Inhabilitado"}
+                      </span>
+                    </td>
+                    <td>
+                      {sancion ? (
+                        <span className="badge badge-off">
+                          {sancion.restantes} fecha{sancion.restantes === 1 ? "" : "s"} · {sancion.motivo}
+                        </span>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
+                    <td>
+                      <form
+                        action={alternarHabilitado.bind(null, equipo.id, jugador.id, jugador.habilitado)}
+                      >
+                        <button className="button button-secondary" type="submit">
+                          {jugador.habilitado ? "Inhabilitar" : "Habilitar"}
+                        </button>
+                      </form>
+                    </td>
+                    <td>
+                      <form action={vincularJugador.bind(null, equipo.id, jugador.id)} className="inline-form">
+                        <select name="profile_id" defaultValue={jugador.profile_id ?? ""}>
+                          <option value="">Sin vincular</option>
+                          {(perfilesJugador ?? []).map((p) => (
+                            <option key={p.id} value={p.id}>{p.full_name ?? p.id}</option>
+                          ))}
+                        </select>
+                        <button className="button button-secondary" type="submit">Vincular</button>
+                      </form>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (
@@ -108,6 +152,31 @@ export default async function EquipoDetallePage({
           </ul>
         ) : (
           <p className="muted">El equipo todavía no está inscripto en ninguna categoría.</p>
+        )}
+
+        <h2>Sanciones activas</h2>
+        {sanciones && sanciones.length > 0 ? (
+          <ul className="list">
+            {sanciones.map((s) => {
+              const jugador = jugadores?.find((j) => j.id === s.jugador_id);
+              return (
+                <li key={s.id} className="list-row">
+                  <span>
+                    {jugador?.nombre_completo ?? "Jugador"} —{" "}
+                    {ETIQUETA_MOTIVO_SANCION[s.motivo as keyof typeof ETIQUETA_MOTIVO_SANCION] ?? s.motivo} ·{" "}
+                    {s.partidos_totales - s.partidos_cumplidos} fecha
+                    {s.partidos_totales - s.partidos_cumplidos === 1 ? "" : "s"} restante
+                    {s.partidos_totales - s.partidos_cumplidos === 1 ? "" : "s"}
+                  </span>
+                  <form action={levantarSancion.bind(null, equipo.id, s.id)}>
+                    <button className="button button-secondary" type="submit">Levantar sanción</button>
+                  </form>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="muted">Ningún jugador de este equipo está suspendido.</p>
         )}
       </article>
 
@@ -169,6 +238,29 @@ export default async function EquipoDetallePage({
             Primero creá al menos una temporada y una categoría en{" "}
             <Link href="/dashboard/configuracion">Configuración</Link>.
           </p>
+        )}
+
+        <h2>Cargar sanción manual</h2>
+        <p className="muted">Para decisiones del tribunal disciplinario fuera de la acumulación automática.</p>
+        {jugadores && jugadores.length > 0 ? (
+          <form action={crearSancionConEquipo}>
+            <div className="field">
+              <label htmlFor="jugador_id">Jugador</label>
+              <select id="jugador_id" name="jugador_id" required defaultValue="">
+                <option value="" disabled>Elegí un jugador</option>
+                {jugadores.map((j) => (
+                  <option key={j.id} value={j.id}>{j.nombre_completo}</option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="partidos_totales">Cantidad de fechas</label>
+              <input id="partidos_totales" name="partidos_totales" type="number" min={1} required />
+            </div>
+            <button className="button button-secondary full" type="submit">Cargar sanción</button>
+          </form>
+        ) : (
+          <p className="muted">Primero agregá jugadores al plantel.</p>
         )}
       </article>
     </section>

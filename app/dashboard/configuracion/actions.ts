@@ -70,3 +70,30 @@ export async function crearCategoria(formData: FormData) {
   revalidatePath("/dashboard/configuracion");
   redirect("/dashboard/configuracion");
 }
+
+export async function guardarReglasDisciplinarias(temporadaId: string, formData: FormData) {
+  const { supabase, perfil } = await requireSesion();
+  exigirRol(perfil, ["superadmin", "admin_liga"]);
+
+  const amarillas = Number(formData.get("amarillas_para_suspension") ?? 3);
+  const partidosAmarillas = Number(formData.get("partidos_suspension_amarillas") ?? 1);
+  const partidosRoja = Number(formData.get("partidos_suspension_roja") ?? 1);
+
+  const { error } = await supabase.from("reglas_disciplinarias").upsert(
+    {
+      temporada_id: temporadaId,
+      amarillas_para_suspension: amarillas,
+      partidos_suspension_amarillas: partidosAmarillas,
+      partidos_suspension_roja: partidosRoja,
+    },
+    { onConflict: "temporada_id" },
+  );
+
+  if (error) {
+    console.error("[reglas_disciplinarias] guardarReglasDisciplinarias failed", error.message);
+    redirect("/dashboard/configuracion?error=No%20se%20pudieron%20guardar%20las%20reglas");
+  }
+
+  revalidatePath("/dashboard/configuracion");
+  redirect("/dashboard/configuracion");
+}

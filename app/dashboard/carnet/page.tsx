@@ -14,6 +14,14 @@ export default async function CarnetPage() {
 
   const equipo = jugador?.equipos as unknown as { nombre: string } | null;
 
+  const { data: sancion } = jugador
+    ? await supabase
+        .from("jugadores_sancionados")
+        .select("partidos_restantes")
+        .eq("jugador_id", jugador.id)
+        .maybeSingle()
+    : { data: null };
+
   return (
     <section className="dashboard-grid">
       <article className="panel">
@@ -37,6 +45,11 @@ export default async function CarnetPage() {
               <span className={`badge ${jugador.habilitado ? "badge-ok" : "badge-off"}`}>
                 {jugador.habilitado ? "Habilitado para jugar" : "Inhabilitado"}
               </span>
+              {sancion && sancion.partidos_restantes > 0 && (
+                <span className="badge badge-off">
+                  Suspendido — {sancion.partidos_restantes} fecha{sancion.partidos_restantes === 1 ? "" : "s"} más
+                </span>
+              )}
             </div>
           </div>
         ) : (

@@ -27,7 +27,7 @@ export default async function PartidoVivoPage({ params }: { params: Promise<{ id
   const puedeEditar = esAdmin || partido.planillero_id === perfil.id;
   if (!puedeEditar) redirect("/dashboard/partidos");
 
-  const [{ data: jugadoresLocal }, { data: jugadoresVisitante }, { data: eventos }] = await Promise.all([
+  const [{ data: jugadoresLocal }, { data: jugadoresVisitante }, { data: eventos }, { data: sancionados }] = await Promise.all([
     supabase
       .from("jugadores")
       .select("id, nombre_completo, numero_camiseta")
@@ -44,7 +44,13 @@ export default async function PartidoVivoPage({ params }: { params: Promise<{ id
       .from("eventos_partido")
       .select("id, partido_id, jugador_id, equipo_id, tipo, minuto")
       .eq("partido_id", id),
+    supabase
+      .from("jugadores_sancionados")
+      .select("jugador_id, partidos_restantes")
+      .in("equipo_id", [equipoLocal.id, equipoVisitante.id]),
   ]);
+
+  const suspendidos = new Set((sancionados ?? []).map((s) => s.jugador_id));
 
   const jugadoresPorId: Record<string, string> = {};
   [...(jugadoresLocal ?? []), ...(jugadoresVisitante ?? [])].forEach((j) => {
@@ -94,6 +100,7 @@ export default async function PartidoVivoPage({ params }: { params: Promise<{ id
                       {(jugadoresLocal ?? []).map((j) => (
                         <option key={j.id} value={`${j.id}::${equipoLocal.id}`}>
                           {j.numero_camiseta ? `#${j.numero_camiseta} ` : ""}{j.nombre_completo}
+                          {suspendidos.has(j.id) ? " ⚠ suspendido" : ""}
                         </option>
                       ))}
                     </optgroup>
@@ -101,6 +108,7 @@ export default async function PartidoVivoPage({ params }: { params: Promise<{ id
                       {(jugadoresVisitante ?? []).map((j) => (
                         <option key={j.id} value={`${j.id}::${equipoVisitante.id}`}>
                           {j.numero_camiseta ? `#${j.numero_camiseta} ` : ""}{j.nombre_completo}
+                          {suspendidos.has(j.id) ? " ⚠ suspendido" : ""}
                         </option>
                       ))}
                     </optgroup>

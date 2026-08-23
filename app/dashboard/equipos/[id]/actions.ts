@@ -97,3 +97,44 @@ export async function inscribirEquipo(equipoId: string, formData: FormData) {
   revalidatePath(`/dashboard/equipos/${equipoId}`);
   redirect(`/dashboard/equipos/${equipoId}`);
 }
+
+export async function levantarSancion(equipoId: string, sancionId: string) {
+  const { supabase, perfil } = await requireSesion();
+  exigirRol(perfil, ["superadmin", "admin_liga"]);
+
+  const { error } = await supabase.from("sanciones").update({ activa: false }).eq("id", sancionId);
+
+  if (error) {
+    console.error("[sanciones] levantarSancion failed", error.message);
+  }
+
+  revalidatePath(`/dashboard/equipos/${equipoId}`);
+}
+
+export async function crearSancionManual(equipoId: string, formData: FormData) {
+  const { supabase, perfil } = await requireSesion();
+  exigirRol(perfil, ["superadmin", "admin_liga"]);
+
+  const jugadorId = String(formData.get("jugador_id") ?? "");
+  const partidosTotalesRaw = String(formData.get("partidos_totales") ?? "").trim();
+  const partidosTotales = Number(partidosTotalesRaw);
+
+  if (!jugadorId || !partidosTotalesRaw || partidosTotales < 1) {
+    redirect(`/dashboard/equipos/${equipoId}?error=Eleg%C3%AD%20un%20jugador%20y%20la%20cantidad%20de%20fechas`);
+  }
+
+  const { error } = await supabase.from("sanciones").insert({
+    jugador_id: jugadorId,
+    equipo_id: equipoId,
+    motivo: "manual",
+    partidos_totales: partidosTotales,
+  });
+
+  if (error) {
+    console.error("[sanciones] crearSancionManual failed", error.message);
+    redirect(`/dashboard/equipos/${equipoId}?error=No%20se%20pudo%20cargar%20la%20sanci%C3%B3n`);
+  }
+
+  revalidatePath(`/dashboard/equipos/${equipoId}`);
+  redirect(`/dashboard/equipos/${equipoId}`);
+}

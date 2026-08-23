@@ -1,5 +1,5 @@
 import { requireSesion, exigirRol } from "@/lib/liga/auth";
-import { crearTemporada, activarTemporada, crearCategoria } from "./actions";
+import { crearTemporada, activarTemporada, crearCategoria, guardarReglasDisciplinarias } from "./actions";
 
 export default async function ConfiguracionPage({
   searchParams,
@@ -14,6 +14,15 @@ export default async function ConfiguracionPage({
     supabase.from("temporadas").select("id, nombre, activa").order("created_at", { ascending: false }),
     supabase.from("categorias").select("id, nombre, orden").order("orden"),
   ]);
+
+  const temporadaActiva = temporadas?.find((t) => t.activa);
+  const { data: reglas } = temporadaActiva
+    ? await supabase
+        .from("reglas_disciplinarias")
+        .select("amarillas_para_suspension, partidos_suspension_amarillas, partidos_suspension_roja")
+        .eq("temporada_id", temporadaActiva.id)
+        .maybeSingle()
+    : { data: null };
 
   return (
     <section className="dashboard-grid">
@@ -78,6 +87,52 @@ export default async function ConfiguracionPage({
           <button className="button button-primary full" type="submit">Crear categoría</button>
         </form>
       </article>
+
+      {temporadaActiva && (
+        <article className="panel">
+          <h2>Reglas disciplinarias</h2>
+          <p className="muted">
+            Se aplican a la temporada activa ({temporadaActiva.nombre}). Las tarjetas cargadas en un
+            partido en vivo generan la suspensión sola, sin que nadie tenga que hacer nada más.
+          </p>
+          <form action={guardarReglasDisciplinarias.bind(null, temporadaActiva.id)}>
+            <div className="field">
+              <label htmlFor="amarillas_para_suspension">Amarillas acumuladas para suspender</label>
+              <input
+                id="amarillas_para_suspension"
+                name="amarillas_para_suspension"
+                type="number"
+                min={1}
+                defaultValue={reglas?.amarillas_para_suspension ?? 3}
+                required
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="partidos_suspension_amarillas">Fechas de suspensión por acumulación</label>
+              <input
+                id="partidos_suspension_amarillas"
+                name="partidos_suspension_amarillas"
+                type="number"
+                min={1}
+                defaultValue={reglas?.partidos_suspension_amarillas ?? 1}
+                required
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="partidos_suspension_roja">Fechas de suspensión por roja directa</label>
+              <input
+                id="partidos_suspension_roja"
+                name="partidos_suspension_roja"
+                type="number"
+                min={1}
+                defaultValue={reglas?.partidos_suspension_roja ?? 1}
+                required
+              />
+            </div>
+            <button className="button button-primary full" type="submit">Guardar reglas</button>
+          </form>
+        </article>
+      )}
     </section>
   );
 }
