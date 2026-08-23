@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireSesion } from "@/lib/liga/auth";
-import { iniciarPartido, finalizarPartido, cargarEvento } from "./actions";
-import PartidoEnVivo from "./partido-en-vivo";
+import { iniciarPartido, finalizarPartido, cargarEvento, borrarEvento } from "./actions";
+import MarcadorEnVivo from "@/app/components/marcador-en-vivo";
 
 export default async function PartidoVivoPage({ params }: { params: Promise<{ id: string }> }) {
   const { supabase, perfil } = await requireSesion();
@@ -58,7 +58,7 @@ export default async function PartidoVivoPage({ params }: { params: Promise<{ id
       <article className="panel">
         <Link className="back-link" href="/dashboard/partidos">← Partidos</Link>
 
-        <PartidoEnVivo
+        <MarcadorEnVivo
           partidoId={id}
           equipoLocalId={equipoLocal.id}
           equipoLocalNombre={equipoLocal.nombre}
@@ -70,6 +70,7 @@ export default async function PartidoVivoPage({ params }: { params: Promise<{ id
           eventosIniciales={eventos ?? []}
           jugadoresPorId={jugadoresPorId}
           puedeEditar={puedeEditar}
+          onBorrarEvento={borrarEvento}
         />
       </article>
 

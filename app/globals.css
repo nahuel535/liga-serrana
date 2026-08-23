@@ -110,6 +110,13 @@ h1 { margin: 22px 0 18px; font-size: clamp(3rem, 8vw, 6.8rem); line-height: .92;
 .carnet-datos { display: flex; flex-direction: column; gap: 4px; }
 .carnet-datos strong { font-size: 1.3rem; }
 
+.brand-mark-link { display: inline-flex; }
+.public-nav-link { color: var(--muted); font-size: .92rem; margin-right: 4px; }
+.public-nav-link:hover { color: var(--text); }
+.publico-shell { padding: 36px 0 60px; }
+.feature-card-link { display: block; }
+.feature-card-link:hover { border-color: var(--accent); }
+
 @media (max-width: 760px) {
   .feature-grid, .dashboard-grid { grid-template-columns: 1fr; }
   .hero { padding: 72px 0 60px; }

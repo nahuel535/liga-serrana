@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ETIQUETA_ESTADO, ETIQUETA_EVENTO, type EventoTipo, type PartidoEstado } from "@/lib/liga/types";
-import { borrarEvento } from "./actions";
 
 type EventoRealtime = {
   id: string;
@@ -14,7 +13,7 @@ type EventoRealtime = {
   minuto: number | null;
 };
 
-export default function PartidoEnVivo({
+export default function MarcadorEnVivo({
   partidoId,
   equipoLocalId,
   equipoLocalNombre,
@@ -25,7 +24,8 @@ export default function PartidoEnVivo({
   estadoInicial,
   eventosIniciales,
   jugadoresPorId,
-  puedeEditar,
+  puedeEditar = false,
+  onBorrarEvento,
 }: {
   partidoId: string;
   equipoLocalId: string;
@@ -37,7 +37,8 @@ export default function PartidoEnVivo({
   estadoInicial: PartidoEstado;
   eventosIniciales: EventoRealtime[];
   jugadoresPorId: Record<string, string>;
-  puedeEditar: boolean;
+  puedeEditar?: boolean;
+  onBorrarEvento?: (eventoId: string, partidoId: string) => Promise<void> | void;
 }) {
   const [golesLocal, setGolesLocal] = useState(golesLocalInicial);
   const [golesVisitante, setGolesVisitante] = useState(golesVisitanteInicial);
@@ -106,11 +107,11 @@ export default function PartidoEnVivo({
                   {evento.minuto != null ? `${evento.minuto}' · ` : ""}
                   {ETIQUETA_EVENTO[evento.tipo]} · {jugadoresPorId[evento.jugador_id] ?? "Jugador"} ({nombreEquipo(evento.equipo_id)})
                 </span>
-                {puedeEditar && estado === "en_vivo" && (
+                {puedeEditar && onBorrarEvento && estado === "en_vivo" && (
                   <button
                     className="button button-secondary"
                     type="button"
-                    onClick={() => borrarEvento(evento.id, partidoId)}
+                    onClick={() => onBorrarEvento(evento.id, partidoId)}
                   >
                     Borrar
                   </button>
