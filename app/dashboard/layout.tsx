@@ -13,6 +13,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/configuracion", label: "Temporadas y categorías", show: esAdmin },
     { href: "/dashboard/partidos", label: "Partidos", show: true },
     { href: "/dashboard/tabla", label: "Tabla de posiciones", show: true },
+    { href: "/dashboard/mis-partidos", label: "Mis partidos", show: perfil.role === "planillero" },
     { href: "/dashboard/mi-equipo", label: "Mi equipo", show: perfil.role === "delegado" },
     { href: "/dashboard/carnet", label: "Mi carnet", show: perfil.role === "jugador" },
     { href: "/dashboard/cuenta", label: "Mi cuenta", show: true },

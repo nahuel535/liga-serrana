@@ -110,6 +110,29 @@ h1 { margin: 22px 0 18px; font-size: clamp(3rem, 8vw, 6.8rem); line-height: .92;
 .carnet-datos { display: flex; flex-direction: column; gap: 4px; }
 .carnet-datos strong { font-size: 1.3rem; }
 
+/* Credencial completa del jugador (dashboard/carnet) */
+.carnet-credencial { max-width: 380px; margin: 0 auto; background: var(--surface-2); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.carnet-credencial-header { background: var(--accent); color: var(--accent-dark); padding: 12px 20px; display: flex; align-items: center; gap: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; font-size: .82rem; }
+.carnet-credencial-marca { width: 26px; height: 26px; border-radius: 7px; background: var(--accent-dark); color: var(--accent); display: grid; place-items: center; font-size: .72rem; font-weight: 900; }
+.carnet-credencial-body { padding: 26px 22px 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.carnet-credencial-foto { width: 108px; height: 108px; border-radius: 50%; overflow: hidden; background: var(--accent); color: var(--accent-dark); display: grid; place-items: center; font-size: 2.6rem; font-weight: 900; border: 3px solid var(--accent); margin-bottom: 4px; }
+.carnet-credencial-foto img { width: 100%; height: 100%; object-fit: cover; }
+.carnet-credencial-nombre { font-size: 1.35rem; line-height: 1.2; }
+.carnet-credencial-numero { font-size: 2rem; font-weight: 900; color: var(--accent); line-height: 1; margin: 2px 0; }
+.carnet-credencial-datos { display: flex; gap: 22px; margin: 6px 0 4px; padding: 0; }
+.carnet-credencial-datos dt { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0; }
+.carnet-credencial-datos dd { font-size: .95rem; margin: 2px 0 0; font-weight: 600; }
+.carnet-credencial-estados { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 6px 0 4px; }
+.carnet-credencial-qr { background: #fff; padding: 12px; border-radius: 14px; margin-top: 10px; line-height: 0; }
+.carnet-credencial-qr img { display: block; width: 160px; height: 160px; }
+.carnet-credencial-hint { font-size: .82rem; max-width: 260px; margin: 4px 0 0; }
+
+/* Verificación pública (a donde lleva el QR) */
+.tema-hincha .carnet-verificacion { max-width: 380px; margin: 24px auto; text-align: center; }
+.tema-hincha .carnet-foto-grande { width: 128px; height: 128px; margin: 0 auto 16px; border: 3px solid var(--accent); }
+.tema-hincha .carnet-verificacion-estados { display: flex; flex-direction: column; gap: 8px; align-items: center; margin-top: 18px; }
+.tema-hincha .carnet-verificacion .eyebrow { display: inline-block; margin-bottom: 18px; }
+
 .brand-mark-link { display: inline-flex; }
 .public-nav-link { color: var(--muted); font-size: .92rem; margin-right: 4px; }
 .public-nav-link:hover { color: var(--text); }
