@@ -15,9 +15,12 @@ type PartidoFila = {
   equipo_visitante: { id: string; nombre: string } | null;
 };
 
+const ZONA_HORARIA = "America/Argentina/Cordoba";
+
 function formatearFecha(fechaIso: string | null) {
   if (!fechaIso) return "Sin fecha";
   return new Date(fechaIso).toLocaleString("es-AR", {
+    timeZone: ZONA_HORARIA,
     weekday: "short",
     day: "2-digit",
     month: "short",
@@ -26,13 +29,34 @@ function formatearFecha(fechaIso: string | null) {
   });
 }
 
+/** Clave YYYY-MM-DD en huso horario local, para agrupar partidos por día. */
+function claveDia(fechaIso: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: ZONA_HORARIA,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(fechaIso));
+}
+
+function etiquetaDiaCorta(fechaIso: string) {
+  const partes = new Intl.DateTimeFormat("es-AR", {
+    timeZone: ZONA_HORARIA,
+    weekday: "short",
+    day: "2-digit",
+  }).formatToParts(new Date(fechaIso));
+  const dia = partes.find((p) => p.type === "weekday")?.value.replace(".", "") ?? "";
+  const numero = partes.find((p) => p.type === "day")?.value ?? "";
+  return { dia: dia.toUpperCase(), numero };
+}
+
 export default async function FixturePublicoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string }>;
+  searchParams: Promise<{ categoria?: string; dia?: string }>;
 }) {
   const supabase = await createClient();
-  const { categoria: categoriaParam } = await searchParams;
+  const { categoria: categoriaParam, dia: diaSeleccionado } = await searchParams;
 
   const { data: categorias } = await supabase.from("categorias").select("id, nombre").order("orden");
   const categoriaId = categoriaParam || categorias?.[0]?.id;
@@ -71,6 +95,21 @@ export default async function FixturePublicoPage({
   const proximos = partidos.filter((p) => p.estado === "programado" || p.estado === "en_vivo");
   const resultados = partidos.filter((p) => p.estado === "finalizado" || p.estado === "suspendido");
 
+  // Días con partidos próximos, en orden, sin repetir.
+  const diasVistos = new Set<string>();
+  const diasDisponibles: { clave: string; dia: string; numero: string }[] = [];
+  proximos.forEach((p) => {
+    if (!p.fecha_hora) return;
+    const clave = claveDia(p.fecha_hora);
+    if (diasVistos.has(clave)) return;
+    diasVistos.add(clave);
+    diasDisponibles.push({ clave, ...etiquetaDiaCorta(p.fecha_hora) });
+  });
+
+  const proximosFiltrados = diaSeleccionado
+    ? proximos.filter((p) => p.fecha_hora && claveDia(p.fecha_hora) === diaSeleccionado)
+    : proximos;
+
   return (
     <>
       <h1>Fixture</h1>
@@ -91,10 +130,31 @@ export default async function FixturePublicoPage({
 
       {!temporadaActiva && <p className="muted">No hay ninguna temporada activa por el momento.</p>}
 
+      {diasDisponibles.length > 0 && (
+        <div className="dia-selector">
+          <Link
+            href={`/fixture?categoria=${categoriaId}`}
+            className={`dia-pill dia-pill-todos ${!diaSeleccionado ? "dia-pill-active" : ""}`}
+          >
+            <span className="dia-pill-label">Todos</span>
+          </Link>
+          {diasDisponibles.map((d) => (
+            <Link
+              key={d.clave}
+              href={`/fixture?categoria=${categoriaId}&dia=${d.clave}`}
+              className={`dia-pill ${diaSeleccionado === d.clave ? "dia-pill-active" : ""}`}
+            >
+              <span className="dia-pill-weekday">{d.dia}</span>
+              <span className="dia-pill-number">{d.numero}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
       <h2>Próximos partidos</h2>
-      {proximos.length > 0 ? (
+      {proximosFiltrados.length > 0 ? (
         <div className="ticket-list">
-          {proximos.map((partido) => (
+          {proximosFiltrados.map((partido) => (
             <Link key={partido.id} href={`/partidos/${partido.id}`} className={`ticket ${partido.estado === "en_vivo" ? "ticket-live" : ""}`}>
               <div className="ticket-main">
                 <div className="ticket-teams">
@@ -119,7 +179,9 @@ export default async function FixturePublicoPage({
           ))}
         </div>
       ) : (
-        <p className="empty-state">No hay partidos programados en esta categoría.</p>
+        <p className="empty-state">
+          {diaSeleccionado ? "No hay partidos ese día." : "No hay partidos programados en esta categoría."}
+        </p>
       )}
 
       <h2>Resultados</h2>

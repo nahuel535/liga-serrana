@@ -9,6 +9,7 @@ import {
   vincularJugador,
   levantarSancion,
   crearSancionManual,
+  asignarDelegado,
 } from "./actions";
 
 export default async function EquipoDetallePage({
@@ -31,8 +32,9 @@ export default async function EquipoDetallePage({
     { data: temporadas },
     { data: perfilesJugador },
     { data: sanciones },
+    { data: perfilesDelegado },
   ] = await Promise.all([
-    supabase.from("equipos").select("id, nombre, escudo_url").eq("id", id).maybeSingle(),
+    supabase.from("equipos").select("id, nombre, escudo_url, delegado_id").eq("id", id).maybeSingle(),
     supabase
       .from("jugadores")
       .select("id, nombre_completo, dni, numero_camiseta, habilitado, profile_id")
@@ -50,6 +52,7 @@ export default async function EquipoDetallePage({
       .select("id, jugador_id, motivo, partidos_totales, partidos_cumplidos, activa")
       .eq("equipo_id", id)
       .eq("activa", true),
+    supabase.from("profiles").select("id, full_name").eq("role", "delegado").eq("active", true),
   ]);
 
   if (!equipo) notFound();
@@ -261,6 +264,31 @@ export default async function EquipoDetallePage({
           </form>
         ) : (
           <p className="muted">Primero agregá jugadores al plantel.</p>
+        )}
+
+        <h2>Delegado del equipo</h2>
+        <p className="muted">
+          El delegado ve, desde su propia cuenta, el plantel, los próximos partidos y las sanciones
+          de este equipo — nada más.
+        </p>
+        {perfilesDelegado && perfilesDelegado.length > 0 ? (
+          <form action={asignarDelegado.bind(null, equipo.id)}>
+            <div className="field">
+              <label htmlFor="delegado_id">Cuenta delegado</label>
+              <select id="delegado_id" name="delegado_id" defaultValue={equipo.delegado_id ?? ""}>
+                <option value="">Sin asignar</option>
+                {perfilesDelegado.map((p) => (
+                  <option key={p.id} value={p.id}>{p.full_name ?? p.id}</option>
+                ))}
+              </select>
+            </div>
+            <button className="button button-secondary full" type="submit">Guardar</button>
+          </form>
+        ) : (
+          <p className="muted">
+            Todavía no hay ninguna cuenta con rol "delegado". Se crean como cualquier otro usuario,
+            registrándose y con el rol cambiado a mano en la tabla `profiles`.
+          </p>
         )}
       </article>
     </section>

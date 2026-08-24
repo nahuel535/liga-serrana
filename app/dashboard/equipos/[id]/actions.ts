@@ -138,3 +138,21 @@ export async function crearSancionManual(equipoId: string, formData: FormData) {
   revalidatePath(`/dashboard/equipos/${equipoId}`);
   redirect(`/dashboard/equipos/${equipoId}`);
 }
+
+export async function asignarDelegado(equipoId: string, formData: FormData) {
+  const { supabase, perfil } = await requireSesion();
+  exigirRol(perfil, ["superadmin", "admin_liga"]);
+
+  const delegadoId = String(formData.get("delegado_id") ?? "").trim();
+
+  const { error } = await supabase
+    .from("equipos")
+    .update({ delegado_id: delegadoId || null })
+    .eq("id", equipoId);
+
+  if (error) {
+    console.error("[equipos] asignarDelegado failed", error.message);
+  }
+
+  revalidatePath(`/dashboard/equipos/${equipoId}`);
+}

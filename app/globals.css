@@ -320,6 +320,52 @@ body:has(.tema-hincha) {
 }
 .tema-hincha .ticket-live .ticket-cta { background: var(--accent); color: #fff; }
 
+.tema-hincha .dia-selector {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 2px 0 24px;
+  padding-bottom: 2px;
+}
+.tema-hincha .dia-pill {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 52px;
+  height: 58px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.tema-hincha .dia-pill-todos { width: 66px; }
+.tema-hincha .dia-pill-weekday {
+  font-family: 'Oswald', Arial, sans-serif;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.tema-hincha .dia-pill-number {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.tema-hincha .dia-pill-label {
+  font-family: 'Oswald', Arial, sans-serif;
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+.tema-hincha .dia-pill-active { background: var(--accent); border-color: var(--accent); }
+.tema-hincha .dia-pill-active .dia-pill-weekday,
+.tema-hincha .dia-pill-active .dia-pill-number,
+.tema-hincha .dia-pill-active .dia-pill-label { color: #fff; }
+
 .tema-hincha .empty-state {
   padding: 32px 18px;
   text-align: center;

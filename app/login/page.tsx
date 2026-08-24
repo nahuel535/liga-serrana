@@ -11,6 +11,7 @@ export default function LoginPage() {
 
         <LoginForm />
 
+        <Link className="back-link" href="/recuperar">¿Olvidaste tu contraseña?</Link>
         <Link className="back-link" href="/">← Volver a Liga Serrana</Link>
       </section>
     </main>

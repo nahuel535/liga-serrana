@@ -79,7 +79,7 @@ export type Sancion = {
   id: string;
   jugador_id: string;
   equipo_id: string;
-  motivo: "acumulacion_amarillas" | "tarjeta_roja" | "manual";
+  motivo: "acumulacion_amarillas" | "tarjeta_roja" | "doble_amarilla" | "manual";
   partido_origen_id: string | null;
   partidos_totales: number;
   partidos_cumplidos: number;
@@ -89,6 +89,7 @@ export type Sancion = {
 export const ETIQUETA_MOTIVO_SANCION: Record<Sancion["motivo"], string> = {
   acumulacion_amarillas: "Acumulación de amarillas",
   tarjeta_roja: "Tarjeta roja",
+  doble_amarilla: "Expulsión (doble amarilla)",
   manual: "Sanción del tribunal",
 };
 
